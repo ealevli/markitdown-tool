@@ -1,13 +1,18 @@
 @echo off
 cd /d "%~dp0"
 
-:: Activate venv if it exists
-if exist "%USERPROFILE%\.venv\Scripts\activate.bat" (
-    call "%USERPROFILE%\.venv\Scripts\activate.bat"
+set VENV_PYTHON=%USERPROFILE%\.venv\Scripts\python.exe
+set SYSTEM_PYTHON=python
+
+:: Pick python executable
+if exist "%VENV_PYTHON%" (
+    set PYTHON=%VENV_PYTHON%
+) else (
+    set PYTHON=%SYSTEM_PYTHON%
 )
 
 echo [MarkItDown] Installing/checking requirements...
-pip install -r requirements.txt --quiet
+"%PYTHON%" -m pip install -r requirements.txt --quiet
 if errorlevel 1 (
     echo [ERROR] pip install failed. Press any key to exit.
     pause >nul
@@ -21,5 +26,5 @@ echo.
 timeout /t 2 /nobreak >nul
 start "" "http://localhost:8000"
 
-python -m uvicorn main:app --port 8000
+"%PYTHON%" -m uvicorn main:app --port 8000
 pause

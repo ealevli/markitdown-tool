@@ -12,7 +12,7 @@ if exist "%VENV_PYTHON%" (
 )
 
 echo [MarkItDown] Installing/checking requirements...
-"%PYTHON%" -m pip install -r requirements.txt --quiet
+"%PYTHON%" -m pip install -r requirements.txt
 if errorlevel 1 (
     echo [ERROR] pip install failed. Press any key to exit.
     pause >nul

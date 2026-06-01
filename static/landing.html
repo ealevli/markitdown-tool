@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocToMark — Convert any file to Markdown</title>
+  <meta name="description" content="Convert PDFs, Word docs, Excel sheets, PowerPoints, images, HTML pages and more to clean Markdown — instantly, for free." />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --surface2:  #21262d;
+      --border:    #30363d;
+      --accent:    #58a6ff;
+      --accent2:   #a371f7;
+      --accent-dim:#1f6feb22;
+      --green:     #3fb950;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --radius:    12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      height: 60px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(12px);
+      gap: 32px;
+    }
+
+    .nav-logo { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.3px; }
+    .nav-logo span { color: var(--accent); }
+    .disclaimer-bar {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 7px 24px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .disclaimer-bar a { color: var(--accent); text-decoration: underline; }
+
+    .nav-links { display: flex; gap: 24px; margin-left: auto; }
+    .nav-links a { font-size: 0.85rem; color: var(--muted); transition: color 0.15s; }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 18px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #0d1117;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .nav-cta:hover { background: #79b8ff; transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 100px 24px 80px;
+      position: relative;
+    }
+
+    /* background glow */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(ellipse at center, #1f6feb18 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .hero-badge .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      max-width: 720px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 .grad {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 28px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.15s;
+      border: none;
+    }
+
+    .btn-hero:hover { transform: translateY(-2px); }
+
+    .btn-hero-primary {
+      background: var(--accent);
+      color: #0d1117;
+      box-shadow: 0 0 24px #58a6ff33;
+    }
+
+    .btn-hero-primary:hover { background: #79b8ff; box-shadow: 0 0 32px #58a6ff55; }
+
+    .btn-hero-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-hero-secondary:hover { border-color: var(--accent); }
+
+    /* ── DEMO PREVIEW ── */
+    .demo-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 0 24px 80px;
+    }
+
+    .demo-window {
+      width: 100%;
+      max-width: 860px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 32px 80px #00000055;
+    }
+
+    .demo-titlebar {
+      background: var(--surface2);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .demo-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+
+    .demo-dot.red   { background: #f85149; }
+    .demo-dot.yellow{ background: #d29922; }
+    .demo-dot.green { background: #3fb950; }
+
+    .demo-bar {
+      flex: 1;
+      margin: 0 12px;
+      background: var(--surface);
+      border-radius: 6px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .demo-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 280px;
+    }
+
+    .demo-pane {
+      padding: 20px 24px;
+    }
+
+    .demo-pane:first-child {
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .demo-pane:last-child { background: var(--bg); }
+
+    .demo-pane-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .demo-file-icon {
+      font-size: 3rem;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .demo-file-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .demo-file-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .demo-arrow {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+
+    .demo-body { position: relative; }
+
+    .demo-md {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--muted);
+      white-space: pre;
+      overflow: hidden;
+    }
+
+    .demo-md .h1  { color: #e6edf3; font-weight: 700; }
+    .demo-md .h2  { color: #cdd9e5; font-weight: 600; }
+    .demo-md .bold{ color: #58a6ff; }
+    .demo-md .link{ color: #a371f7; }
+
+    /* ── HOW IT WORKS ── */
+    section { padding: 80px 24px; }
+
+    .section-label {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+
+    .section-sub {
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--muted);
+      max-width: 500px;
+      margin: 0 auto 56px;
+      line-height: 1.6;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 640px) { .steps { grid-template-columns: 1fr; } }
+
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      position: relative;
+      transition: border-color 0.2s;
+    }
+
+    .step:hover { border-color: var(--accent); }
+
+    .step-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .step h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+    .step p  { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── FORMATS ── */
+    .formats-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+    .format-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .format-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .format-card:hover { border-color: var(--accent); background: var(--accent-dim); }
+
+    .format-icon { font-size: 1.5rem; line-height: 1; flex-shrink: 0; }
+
+    .format-info .format-name { font-size: 0.85rem; font-weight: 600; }
+    .format-info .format-ext  { font-size: 0.72rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+    /* ── FEATURES ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 700px) { .features { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) and (min-width: 700px) { .features { grid-template-columns: 1fr 1fr; } }
+
+    .feat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+
+    .feat-card:hover { border-color: var(--border); }
+
+    .feat-icon {
+      font-size: 1.6rem;
+      margin-bottom: 14px;
+    }
+
+    .feat-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; }
+    .feat-card p  { font-size: 0.83rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── CTA BOTTOM ── */
+    .cta-section {
+      text-align: center;
+      padding: 100px 24px;
+      position: relative;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse at center, #a371f718 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-section h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .cta-section p { font-size: 1rem; color: var(--muted); margin-bottom: 36px; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    footer a { color: var(--muted); transition: color 0.15s; }
+    footer a:hover { color: var(--text); }
+
+    .footer-links { display: flex; gap: 20px; }
+
+    /* ── RESPONSIVE NAV ── */
+    @media (max-width: 600px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      footer { justify-content: center; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- DISCLAIMER -->
+<div class="disclaimer-bar">
+  ⚠️ DocToMark is an independent, open-source tool and is <strong>not affiliated with or endorsed by Microsoft</strong>. It uses the <a href="https://github.com/microsoft/markitdown" target="_blank" rel="noopener">Microsoft MarkItDown</a> library under the hood.
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Doc<span>ToMark</span></div>
+  <div class="nav-links">
+    <a href="#how-it-works">How it works</a>
+    <a href="#formats">Formats</a>
+    <a href="#features">Features</a>
+  </div>
+  <a class="nav-cta" href="/app">Launch App →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <div class="dot"></div>
+    Free · No signup · Files deleted immediately after conversion
+  </div>
+
+  <h1>Convert <span class="grad">any file</span><br>to clean&nbsp;Markdown</h1>
+
+  <p>PDFs, Word docs, spreadsheets, presentations, images, web pages — transformed into Markdown in seconds. Ready to paste into any LLM, doc, or codebase.</p>
+
+  <div class="hero-actions">
+    <a class="btn-hero btn-hero-primary" href="/app">
+      Start converting — it's free
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8.22 2.97a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734L11 8.5H2.75a.75.75 0 0 1 0-1.5H11L8.22 4.03a.75.75 0 0 1 0-1.06Z"/></svg>
+    </a>
+    <a class="btn-hero btn-hero-secondary" href="#how-it-works">See how it works</a>
+  </div>
+</section>
+
+<!-- DEMO WINDOW -->
+<div class="demo-wrap">
+  <div class="demo-window">
+    <div class="demo-titlebar">
+      <div class="demo-dot red"></div>
+      <div class="demo-dot yellow"></div>
+      <div class="demo-dot green"></div>
+      <div class="demo-bar">localhost:8000/app</div>
+    </div>
+    <div class="demo-body">
+      <div class="demo-pane">
+        <div class="demo-pane-label">Input file</div>
+        <div class="demo-file-icon">📊</div>
+        <div class="demo-file-name">Q4_Report_2024.xlsx</div>
+        <div class="demo-file-meta">Excel Spreadsheet · 2.4 MB</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;padding:0 12px;background:var(--surface2);border-right:1px solid var(--border);border-left:1px solid var(--border);">
+        <span style="font-size:1.4rem;color:var(--accent);">→</span>
+      </div>
+      <div class="demo-pane">
+        <div class="demo-pane-label">Markdown output</div>
+        <div class="demo-md"><span class="h1"># Q4 Report 2024</span>
+
+<span class="h2">## Revenue Summary</span>
+
+| Quarter | Revenue | Growth |
+|---------|---------|--------|
+| Q1      | $1.2M   | +12%   |
+| Q2      | $1.5M   | +25%   |
+
+<span class="bold">**Total:** $5.8M</span>
+
+<span class="link">[View full report →](#)</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="section-label">How it works</div>
+  <div class="section-title">Three steps, zero friction</div>
+  <div class="section-sub">No account, no upload limits, no waiting. Your files are processed on your machine and never stored.</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Drop your file</h3>
+      <p>Drag & drop any supported file, click to browse, or paste a URL. Works with PDFs, Office files, images, web pages and more.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Convert instantly</h3>
+      <p>Powered by Microsoft's open-source MarkItDown library, conversion happens server-side in milliseconds. Files are deleted immediately after processing.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Copy or download</h3>
+      <p>Copy to clipboard with one click or download the <code style="font-family:monospace;font-size:0.85em;">.md</code> file. See character count, line count and token estimate.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SUPPORTED FORMATS -->
+<section id="formats" class="formats-section">
+  <div class="section-label">Supported formats</div>
+  <div class="section-title">If you have it, we convert it</div>
+  <div class="section-sub">Over 20 file types supported out of the box.</div>
+
+  <div class="format-grid">
+    <div class="format-card">
+      <div class="format-icon">📄</div>
+      <div class="format-info">
+        <div class="format-name">PDF</div>
+        <div class="format-ext">.pdf</div>
+      </div>
+    </div>
+    <div class="format-card">
+      <div class="format-icon">📝</div>
+      <div class="format-info">
+        <div class="format-name">Word</div>
+        <div class="format-ext">.docx</div>
+      </div>
+    </div>
+    <div class="format-card">
+      <div class="format-icon">📊</div>
+      <div class="format-info">
+        <div class="format-name">Excel</div>
+        <div class="format-ext">.xlsx</div>
+      </div>
+    </div>
+    <div class="format-card">
+      <div class="format-icon">📽️</div>
+      <div class="format-info">
+        <div class="format-name">PowerPoint</div>
+        <div class="format-ext">.pptx</div>
+      </div>
+    </div>
+    <div class="format-card">
+      <div class="format-icon">🌐</div>
+      <div class="format-info">
+        <div class="format-name">Web Page</div>
+        <div class="format-ext">.html / URL</div>
+      </div>
+    </div>
+    <div class="format-card">
+      <div class="format-icon">🖼️</div>
+      <div class="format-info">
+        <div class="format-name">Images</div>
+        <div class="format-ext">.png .jpg .webp</div>
+      </div>
+    </div>
+    <div class="format-card">
+      <div class="format-icon">📋</div>
+      <div class="format-info">
+        <div class="format-name">CSV / JSON</div>
+        <div class="format-ext">.csv .json .xml</div>
+      </div>
+    </div>
+    <div class="format-card">
+      <div class="format-icon">📦</div>
+      <div class="format-info">
+        <div class="format-name">Archive</div>
+        <div class="format-ext">.zip .epub</div>
+      </div>
+    </div>
+    <div class="format-card">
+      <div class="format-icon">🎵</div>
+      <div class="format-info">
+        <div class="format-name">Audio</div>
+        <div class="format-ext">.wav .mp3</div>
+      </div>
+    </div>
+    <div class="format-card">
+      <div class="format-icon">✉️</div>
+      <div class="format-info">
+        <div class="format-name">Email</div>
+        <div class="format-ext">.msg .eml</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Features</div>
+  <div class="section-title">Everything you need, nothing you don't</div>
+  <div class="section-sub">Built for developers, writers, and anyone feeding content into AI models.</div>
+
+  <div class="features">
+    <div class="feat-card">
+      <div class="feat-icon">🔒</div>
+      <h3>100% local processing</h3>
+      <p>Your files are converted on your own machine. Nothing is uploaded to any server. Not even temporarily.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔗</div>
+      <h3>URL to Markdown</h3>
+      <p>Paste any public URL — web page, PDF, news article — and get clean Markdown back instantly.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📁</div>
+      <h3>Batch conversion</h3>
+      <p>Select multiple files at once. They're converted in order and you can switch between results with a single click.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📥</div>
+      <h3>Download as .md</h3>
+      <p>Copy to clipboard or download the result as a proper <code style="font-family:monospace">.md</code> file, named after your original document.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🪙</div>
+      <h3>Token estimate</h3>
+      <p>See an approximate token count alongside character and line counts — useful when preparing context for LLMs.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚡</div>
+      <h3>No size headaches</h3>
+      <p>Files up to 50 MB are supported. The tool checks size before upload so you never wait for a rejection.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BOTTOM -->
+<section class="cta-section">
+  <h2>Ready to convert your first file?</h2>
+  <p>Free, instant, and private. No signup required.</p>
+  <a class="btn-hero btn-hero-primary" href="/app" style="display:inline-flex;">
+    Open DocToMark
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8.22 2.97a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734L11 8.5H2.75a.75.75 0 0 1 0-1.5H11L8.22 4.03a.75.75 0 0 1 0-1.06Z"/></svg>
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="nav-logo" style="font-size:0.9rem;">Doc<span style="color:var(--accent);">ToMark</span></div>
+  <div style="color:var(--muted); font-size:0.78rem;">Not affiliated with Microsoft &nbsp;·&nbsp; Powered by <a href="https://github.com/microsoft/markitdown" target="_blank" rel="noopener" style="color:var(--accent);">MarkItDown</a></div>
+  <div class="footer-links">
+    <a href="/app">Launch App</a>
+    <a href="https://github.com/microsoft/markitdown" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>

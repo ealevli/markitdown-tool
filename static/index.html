@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MarkItDown</title>
+  <title>DocToMark</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
@@ -40,19 +40,9 @@
       gap: 10px;
     }
 
-    header .logo {
-      font-size: 1.15rem;
-      font-weight: 600;
-      letter-spacing: -0.3px;
-    }
-
+    header .logo { font-size: 1.15rem; font-weight: 600; letter-spacing: -0.3px; }
     header .logo span { color: var(--accent); }
-
-    header .tagline {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-left: auto;
-    }
+    header .tagline { font-size: 0.8rem; color: var(--muted); margin-left: auto; }
 
     main {
       flex: 1;
@@ -61,6 +51,38 @@
       align-items: center;
       justify-content: center;
       padding: 40px 24px;
+      gap: 32px;
+    }
+
+    /* ── Input mode tabs ── */
+    .input-tabs {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 640px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 9px 16px;
+      background: var(--surface2);
+      border: none;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .tab-btn:first-child { border-right: 1px solid var(--border); }
+
+    .tab-btn.active {
+      background: var(--accent-dim);
+      color: var(--accent);
     }
 
     /* ── Drop zone ── */
@@ -76,8 +98,7 @@
       position: relative;
     }
 
-    #drop-zone:hover,
-    #drop-zone.drag-over {
+    #drop-zone:hover, #drop-zone.drag-over {
       border-color: var(--accent);
       background: var(--accent-dim);
     }
@@ -91,28 +112,11 @@
       height: 100%;
     }
 
-    #drop-zone .drop-icon {
-      font-size: 2.8rem;
-      line-height: 1;
-      margin-bottom: 16px;
-      pointer-events: none;
-    }
-
-    #drop-zone .drop-title {
-      font-size: 1.1rem;
-      font-weight: 500;
-      margin-bottom: 6px;
-      pointer-events: none;
-    }
-
-    #drop-zone .drop-sub {
-      font-size: 0.82rem;
-      color: var(--muted);
-      pointer-events: none;
-    }
+    #drop-zone .drop-icon { font-size: 2.8rem; line-height: 1; margin-bottom: 16px; pointer-events: none; }
+    #drop-zone .drop-title { font-size: 1.1rem; font-weight: 500; margin-bottom: 6px; pointer-events: none; }
+    #drop-zone .drop-sub { font-size: 0.82rem; color: var(--muted); pointer-events: none; }
 
     .supported-types {
-      margin-top: 24px;
       font-size: 0.75rem;
       color: var(--muted);
       max-width: 640px;
@@ -131,6 +135,90 @@
       display: inline-block;
     }
 
+    /* ── URL input ── */
+    #url-section {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 640px;
+    }
+
+    .url-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .url-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .url-input:focus { border-color: var(--accent); }
+    .url-input::placeholder { color: var(--muted); }
+
+    /* ── Queue ── */
+    #queue-section {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      max-width: 640px;
+    }
+
+    .queue-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .queue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.83rem;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .queue-item:hover { border-color: var(--accent); }
+    .queue-item.active { border-color: var(--accent); background: var(--accent-dim); }
+
+    .queue-item .q-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .queue-badge {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 20px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-pending  { background: var(--surface2); color: var(--muted); }
+    .badge-running  { background: #1f3a5f; color: var(--accent); }
+    .badge-done     { background: #0d2b16; color: var(--green); }
+    .badge-error    { background: #2d1117; color: var(--red); }
+
     /* ── Spinner ── */
     #spinner {
       display: none;
@@ -140,8 +228,7 @@
     }
 
     .spinner-ring {
-      width: 48px;
-      height: 48px;
+      width: 48px; height: 48px;
       border: 3px solid var(--border);
       border-top-color: var(--accent);
       border-radius: 50%;
@@ -209,18 +296,13 @@
       cursor: pointer;
       transition: border-color 0.15s, background 0.15s;
       white-space: nowrap;
+      text-decoration: none;
     }
 
     .btn:hover { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
 
-    .btn-primary {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #0d1117;
-    }
-
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #0d1117; }
     .btn-primary:hover { background: #79b8ff; border-color: #79b8ff; color: #0d1117; }
-
     .btn.copied { border-color: var(--green); color: var(--green); background: #12261e; }
 
     .split {
@@ -230,9 +312,7 @@
       min-height: 0;
     }
 
-    @media (max-width: 720px) {
-      .split { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 720px) { .split { grid-template-columns: 1fr; } }
 
     .panel {
       background: var(--surface);
@@ -252,57 +332,20 @@
       background: var(--surface2);
     }
 
-    .stats-body {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+    .stats-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
-    .stat {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+    .stat { display: flex; flex-direction: column; gap: 2px; }
+    .stat-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+    .stat-value { font-size: 1.1rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+    .stat-value.filename { font-size: 0.85rem; word-break: break-all; color: var(--text); }
+    .stat-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
 
-    .stat-label {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-    }
-
-    .stat-value {
-      font-size: 1.1rem;
-      font-weight: 600;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--accent);
-    }
-
-    .stat-value.filename {
-      font-size: 0.85rem;
-      word-break: break-all;
-      color: var(--text);
-    }
-
-    .stat-divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 0;
-    }
-
-    .output-wrap {
-      position: relative;
-      height: 520px;
-    }
+    .output-wrap { position: relative; height: 520px; }
 
     #output {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       background: transparent;
-      border: none;
-      outline: none;
-      resize: none;
+      border: none; outline: none; resize: none;
       padding: 16px;
       color: var(--text);
       font-family: 'JetBrains Mono', monospace;
@@ -325,32 +368,61 @@
 <body>
 
 <header>
-  <div class="logo">Mark<span>ItDown</span></div>
+  <a href="/" style="text-decoration:none;color:inherit;"><div class="logo">Doc<span>ToMark</span></div></a>
   <div class="tagline">Convert any file to Markdown</div>
 </header>
 
 <main>
 
-  <!-- Drop Zone -->
-  <div id="upload-section">
-    <div id="drop-zone">
-      <input type="file" id="file-input" />
-      <div class="drop-icon">📄</div>
-      <div class="drop-title">Drop a file here, or click to browse</div>
-      <div class="drop-sub">PDF, Word, Excel, PowerPoint, HTML, CSV, JSON, Images, ZIP&hellip;</div>
+  <!-- Upload section -->
+  <div id="upload-section" style="display:flex; flex-direction:column; align-items:center; gap:20px; width:100%; max-width:640px;">
+
+    <!-- Tabs -->
+    <div class="input-tabs" style="width:100%">
+      <button class="tab-btn active" id="tab-file" onclick="switchTab('file')">📄 File</button>
+      <button class="tab-btn" id="tab-url"  onclick="switchTab('url')">🔗 URL</button>
     </div>
-    <div class="supported-types">
-      <code>.pdf</code><code>.docx</code><code>.xlsx</code><code>.pptx</code>
-      <code>.html</code><code>.csv</code><code>.json</code><code>.xml</code>
-      <code>.png</code><code>.jpg</code><code>.zip</code><code>.epub</code>
-      <code>.msg</code><code>.wav</code><code>.mp3</code> and more
+
+    <!-- File tab -->
+    <div id="file-section" style="width:100%; display:flex; flex-direction:column; gap:16px; align-items:center;">
+      <div id="drop-zone">
+        <input type="file" id="file-input" multiple />
+        <div class="drop-icon">📄</div>
+        <div class="drop-title">Drop files here, or click to browse</div>
+        <div class="drop-sub">Supports multiple files &mdash; converted one by one</div>
+      </div>
+      <div class="supported-types">
+        <code>.pdf</code><code>.docx</code><code>.xlsx</code><code>.pptx</code>
+        <code>.html</code><code>.csv</code><code>.json</code><code>.xml</code>
+        <code>.png</code><code>.jpg</code><code>.zip</code><code>.epub</code>
+        <code>.msg</code><code>.wav</code><code>.mp3</code> and more &nbsp;·&nbsp; Max 50 MB per file
+      </div>
     </div>
+
+    <!-- URL tab -->
+    <div id="url-section">
+      <div class="url-row">
+        <input class="url-input" id="url-input" type="url" placeholder="https://example.com/document.pdf" />
+        <button class="btn btn-primary" onclick="handleUrlConvert()">Convert</button>
+      </div>
+      <div style="font-size:0.75rem; color:var(--muted);">Paste any public URL — web page, PDF, doc, etc.</div>
+    </div>
+
+  </div>
+
+  <!-- Queue (multi-file) -->
+  <div id="queue-section">
+    <div class="queue-header">
+      <span id="queue-label">0 files</span>
+      <button class="btn" onclick="resetAll()">↩ Start over</button>
+    </div>
+    <div class="queue-list" id="queue-list"></div>
   </div>
 
   <!-- Spinner -->
   <div id="spinner">
     <div class="spinner-ring"></div>
-    <div class="spinner-label">Converting&hellip;</div>
+    <div class="spinner-label" id="spinner-label">Converting&hellip;</div>
   </div>
 
   <!-- Error -->
@@ -363,16 +435,21 @@
   <div id="result">
     <div class="result-header">
       <h2 id="result-title"></h2>
-      <button class="btn" id="copy-btn">
+      <button class="btn" id="copy-btn" onclick="copyOutput()">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
           <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/>
           <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/>
         </svg>
-        Copy to Clipboard
+        Copy
       </button>
-      <button class="btn btn-primary" id="reset-btn">
-        ↩ Convert Another
+      <button class="btn" id="download-btn" onclick="downloadOutput()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z"/>
+          <path d="M7.25 7.689V2a.75.75 0 0 1 1.5 0v5.689l1.97-1.97a.749.749 0 1 1 1.06 1.06l-3.25 3.25a.749.749 0 0 1-1.06 0L4.22 6.779a.749.749 0 1 1 1.06-1.06l1.97 1.97Z"/>
+        </svg>
+        Download .md
       </button>
+      <button class="btn btn-primary" onclick="resetAll()">↩ Convert Another</button>
     </div>
 
     <div class="split">
@@ -410,109 +487,251 @@
 
 </main>
 
-<footer>Powered by <strong>MarkItDown</strong> &nbsp;·&nbsp; Files are processed locally and never stored</footer>
+<footer>
+  <strong>DocToMark</strong> &nbsp;·&nbsp; Powered by <a href="https://github.com/microsoft/markitdown" target="_blank" rel="noopener" style="color:var(--accent);">Microsoft MarkItDown</a>
+  &nbsp;·&nbsp; Not affiliated with Microsoft
+  &nbsp;·&nbsp; Files are deleted immediately after conversion
+</footer>
 
 <script>
+  const MAX_FILE_BYTES = 50 * 1024 * 1024;
+
+  // ── Element refs ──
+  const uploadSec   = document.getElementById('upload-section');
+  const queueSec    = document.getElementById('queue-section');
+  const queueList   = document.getElementById('queue-list');
+  const queueLabel  = document.getElementById('queue-label');
   const dropZone    = document.getElementById('drop-zone');
   const fileInput   = document.getElementById('file-input');
-  const uploadSec   = document.getElementById('upload-section');
   const spinner     = document.getElementById('spinner');
+  const spinnerLbl  = document.getElementById('spinner-label');
   const errorBox    = document.getElementById('error-box');
   const errorMsg    = document.getElementById('error-msg');
   const result      = document.getElementById('result');
   const output      = document.getElementById('output');
   const copyBtn     = document.getElementById('copy-btn');
-  const resetBtn    = document.getElementById('reset-btn');
   const resultTitle = document.getElementById('result-title');
   const statFilename = document.getElementById('stat-filename');
   const statChars   = document.getElementById('stat-chars');
   const statTokens  = document.getElementById('stat-tokens');
   const statLines   = document.getElementById('stat-lines');
 
-  // Drag-and-drop visual feedback
+  // ── Visibility helpers ──
+  function show(el, displayType = 'flex') { el.style.display = displayType; }
+  function hide(el) { el.style.display = 'none'; }
+
+  // ── Tabs ──
+  function switchTab(tab) {
+    document.getElementById('tab-file').classList.toggle('active', tab === 'file');
+    document.getElementById('tab-url').classList.toggle('active', tab === 'url');
+    document.getElementById('file-section').style.display = tab === 'file' ? 'flex' : 'none';
+    document.getElementById('url-section').style.display  = tab === 'url'  ? 'flex' : 'none';
+  }
+
+  // ── Drag & drop ──
   dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
   dropZone.addEventListener('drop', e => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
-    const f = e.dataTransfer.files[0];
-    if (f) uploadFile(f);
+    if (e.dataTransfer.files.length) handleFiles([...e.dataTransfer.files]);
   });
 
   fileInput.addEventListener('change', () => {
-    if (fileInput.files[0]) uploadFile(fileInput.files[0]);
+    if (fileInput.files.length) handleFiles([...fileInput.files]);
   });
 
-  async function uploadFile(file) {
-    show(spinner);
+  // ── URL convert ──
+  async function handleUrlConvert() {
+    const url = document.getElementById('url-input').value.trim();
+    if (!url) return;
     hide(uploadSec);
     hide(errorBox);
-    hide(result);
-
-    const fd = new FormData();
-    fd.append('file', file);
+    spinnerLbl.textContent = 'Fetching & converting…';
+    show(spinner);
 
     try {
-      const res = await fetch('/convert', { method: 'POST', body: fd });
+      const res  = await fetch('/convert-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
       const data = await res.json();
-
-      if (!res.ok) {
-        showError(data.detail || 'Unknown error');
-        return;
-      }
-
-      const lines = (data.markdown.match(/\n/g) || []).length + 1;
-
-      resultTitle.textContent   = data.filename;
-      statFilename.textContent  = data.filename;
-      statChars.textContent     = data.char_count.toLocaleString();
-      statTokens.textContent    = '~' + data.token_estimate.toLocaleString();
-      statLines.textContent     = lines.toLocaleString();
-      output.value              = data.markdown;
-
-      hide(spinner);
-      show(result);
+      if (!res.ok) { showError(data.detail || 'Unknown error'); return; }
+      showResult(data);
     } catch (err) {
       showError(err.message || 'Network error');
     }
   }
 
+  document.getElementById('url-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleUrlConvert();
+  });
+
+  // ── Multi-file queue ──
+  let queue = [];   // [{ file, status:'pending'|'running'|'done'|'error', data, error }]
+
+  function handleFiles(files) {
+    const oversized = files.filter(f => f.size > MAX_FILE_BYTES);
+    if (oversized.length) {
+      const names = oversized.map(f => f.name).join(', ');
+      showError(`File(s) exceed the 50 MB limit: ${names}`);
+      return;
+    }
+
+    if (files.length === 1) {
+      uploadSingleFile(files[0]);
+      return;
+    }
+
+    // Multi-file flow
+    queue = files.map(f => ({ file: f, status: 'pending', data: null, error: null }));
+    hide(uploadSec);
+    hide(errorBox);
+    renderQueue();
+    show(queueSec, 'flex');
+    processQueue();
+  }
+
+  function renderQueue() {
+    queueLabel.textContent = `${queue.length} file${queue.length !== 1 ? 's' : ''}`;
+    queueList.innerHTML = queue.map((item, i) => `
+      <div class="queue-item ${item.status === 'done' ? '' : ''}" id="qi-${i}" onclick="selectQueueItem(${i})">
+        <span class="q-name" title="${item.file.name}">${item.file.name}</span>
+        <span class="queue-badge badge-${item.status}">${
+          item.status === 'pending' ? 'Pending'
+        : item.status === 'running' ? 'Converting…'
+        : item.status === 'done'    ? 'Done'
+        :                             'Error'
+        }</span>
+      </div>
+    `).join('');
+  }
+
+  async function processQueue() {
+    for (let i = 0; i < queue.length; i++) {
+      if (queue[i].status !== 'pending') continue;
+      queue[i].status = 'running';
+      renderQueue();
+
+      const fd = new FormData();
+      fd.append('file', queue[i].file);
+
+      try {
+        const res  = await fetch('/convert', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Unknown error');
+        queue[i].status = 'done';
+        queue[i].data   = data;
+      } catch (err) {
+        queue[i].status = 'error';
+        queue[i].error  = err.message;
+      }
+      renderQueue();
+    }
+    // Auto-select first successful result
+    const first = queue.findIndex(q => q.status === 'done');
+    if (first !== -1) selectQueueItem(first);
+  }
+
+  function selectQueueItem(i) {
+    const item = queue[i];
+    if (item.status !== 'done') return;
+    document.querySelectorAll('.queue-item').forEach((el, j) =>
+      el.classList.toggle('active', j === i));
+    showResult(item.data);
+  }
+
+  // ── Single file upload ──
+  async function uploadSingleFile(file) {
+    if (file.size > MAX_FILE_BYTES) {
+      showError(`File exceeds the 50 MB limit (${(file.size / 1024 / 1024).toFixed(1)} MB).`);
+      return;
+    }
+    hide(uploadSec);
+    hide(errorBox);
+    spinnerLbl.textContent = 'Converting…';
+    show(spinner);
+
+    const fd = new FormData();
+    fd.append('file', file);
+
+    try {
+      const res  = await fetch('/convert', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) { showError(data.detail || 'Unknown error'); return; }
+      showResult(data);
+    } catch (err) {
+      showError(err.message || 'Network error');
+    }
+  }
+
+  // ── Show result ──
+  function showResult(data) {
+    const lines = (data.markdown.match(/\n/g) || []).length + 1;
+    resultTitle.textContent  = data.filename;
+    statFilename.textContent = data.filename;
+    statChars.textContent    = data.char_count.toLocaleString();
+    statTokens.textContent   = '~' + data.token_estimate.toLocaleString();
+    statLines.textContent    = lines.toLocaleString();
+    output.value             = data.markdown;
+
+    hide(spinner);
+    hide(errorBox);
+    show(result, 'flex');
+  }
+
+  // ── Show error ──
   function showError(msg) {
     errorMsg.textContent = msg;
     hide(spinner);
-    show(errorBox);
-    show(uploadSec);
+    show(errorBox, 'block');
+    if (!queueSec.style.display || queueSec.style.display === 'none') {
+      show(uploadSec, 'flex');
+    }
   }
 
-  copyBtn.addEventListener('click', async () => {
+  // ── Copy ──
+  async function copyOutput() {
     try {
       await navigator.clipboard.writeText(output.value);
       copyBtn.classList.add('copied');
       copyBtn.textContent = '✓ Copied!';
       setTimeout(() => {
         copyBtn.classList.remove('copied');
-        copyBtn.innerHTML = `
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/>
-            <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/>
-          </svg>
-          Copy to Clipboard`;
+        copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/>
+          <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/>
+        </svg> Copy`;
       }, 2000);
     } catch {
       copyBtn.textContent = 'Copy failed';
     }
-  });
+  }
 
-  resetBtn.addEventListener('click', () => {
-    hide(result);
-    hide(errorBox);
+  // ── Download ──
+  function downloadOutput() {
+    const filename = (statFilename.textContent || 'output').replace(/\.[^.]+$/, '') + '.md';
+    const blob = new Blob([output.value], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  // ── Reset ──
+  function resetAll() {
+    queue = [];
     fileInput.value = '';
     output.value = '';
-    show(uploadSec);
-  });
-
-  function show(el) { el.style.display = el === result ? 'flex' : 'flex'; el.style.display = (el === result) ? 'flex' : (el === spinner ? 'flex' : 'block'); }
-  function hide(el) { el.style.display = 'none'; }
+    document.getElementById('url-input').value = '';
+    hide(result);
+    hide(errorBox);
+    hide(queueSec);
+    show(uploadSec, 'flex');
+    switchTab('file');
+  }
 </script>
 </body>
 </html>

@@ -1,6 +1,11 @@
 @echo off
 cd /d "%~dp0"
 
+:: Activate venv if it exists
+if exist "%USERPROFILE%\.venv\Scripts\activate.bat" (
+    call "%USERPROFILE%\.venv\Scripts\activate.bat"
+)
+
 echo [MarkItDown] Checking dependencies...
 pip show markitdown >nul 2>&1
 if errorlevel 1 (

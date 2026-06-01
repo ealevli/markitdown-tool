@@ -11,4 +11,4 @@ fi
 
 echo "[MarkItDown] Starting server at http://localhost:8000"
 open http://localhost:8000 2>/dev/null || xdg-open http://localhost:8000 2>/dev/null || true
-uvicorn main:app --port 8000
+python3 -m uvicorn main:app --port 8000

@@ -6,16 +6,12 @@ if exist "%USERPROFILE%\.venv\Scripts\activate.bat" (
     call "%USERPROFILE%\.venv\Scripts\activate.bat"
 )
 
-echo [MarkItDown] Checking dependencies...
-pip show markitdown >nul 2>&1
+echo [MarkItDown] Installing/checking requirements...
+pip install -r requirements.txt --quiet
 if errorlevel 1 (
-    echo [MarkItDown] Installing requirements...
-    pip install -r requirements.txt
-    if errorlevel 1 (
-        echo [ERROR] pip install failed. Press any key to exit.
-        pause >nul
-        exit /b 1
-    )
+    echo [ERROR] pip install failed. Press any key to exit.
+    pause >nul
+    exit /b 1
 )
 
 echo [MarkItDown] Starting server at http://localhost:8000
